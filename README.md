@@ -193,17 +193,12 @@ npm run dev
 ```
 
 ### Access the application:
-
 Once the app is running with the h2 profile:
-    - Frontend: http://localhost:3000
-    - Backend API: http://localhost:8081/api
-    - Health check: http://localhost:8081/api/health
-    - H2 console: http://localhost:8081/api/health
-    - (JDBC URL: jdbc:h2:mem:shopdb, user: sa, password: empty)
-      ![h-2 console](demo-imgs/h2-console.png)
-
-      
-
+  - Frontend: http://localhost:3000
+  - Backend API: http://localhost:8081/api
+  - Health check: http://localhost:8081/api/health
+  - H2 console: http://localhost:8081/api/health
+  - (JDBC URL: jdbc:h2:mem:shopdb, user: sa, password: empty)
 
 ## Debugging
 
@@ -265,11 +260,6 @@ This section provides instructions on how to use the debugging capabilities adde
 - If you can't connect to the remote debugger, make sure port 5005 is not blocked by a firewall
 - If the application seems to hang on startup, check if the debugger is set to suspend on startup (it shouldn't be with the current configuration)
 
-#### Additional Resources
-
-- [Remote Debugging Java Applications](https://www.jetbrains.com/help/idea/tutorial-remote-debug.html)
-- [Debugging React Applications](https://reactjs.org/docs/debugging-tools.html)
-- [Nginx Debugging](https://docs.nginx.com/nginx/admin-guide/monitoring/debugging/)
 
 ## Next Steps
 
@@ -277,6 +267,9 @@ This is a skeleton project with minimal functionality. Next steps for developmen
 
 1. Implement payment integration
 2. Enhance UI with better styling and user experience
+3. Integrate with my separate  **User Service** (separate Spring Boot microservice) for centralized user management.
+4. Introduce **event-driven communication** between services (e.g. order events published to a message broker and consumed by the User Service or notification service).
+5. Add observability and security monitoring (centralized logging, metrics, audit trail for user actions).
 
 ## License
 
