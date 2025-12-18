@@ -1,0 +1,79 @@
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: online-shop-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: online_shop
+      MYSQL_USER: shop_user
+      MYSQL_PASSWORD: shop_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - shop-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: online-shop-backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/online_shop?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: shop_user
+      SPRING_DATASOURCE_PASSWORD: shop_password
+      # Debug environment variables
+      LOGGING_LEVEL_ROOT: DEBUG
+      LOGGING_LEVEL_COM_SHOP: DEBUG
+      JAVA_TOOL_OPTIONS: "-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp"
+    ports:
+      - "8081:8080"
+      - "5005:5005"  # Expose remote debug port
+    volumes:
+      - ./backend/src:/app/src  # Mount source code for live debugging
+    networks:
+      - shop-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: online-shop-frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      # Debug environment variables
+      NODE_ENV: development
+      GENERATE_SOURCEMAP: "true"
+      REACT_APP_DEBUG: "true"
+    ports:
+      - "8082:80"
+      - "35729:35729"  # LiveReload port
+    volumes:
+      - ./frontend/src:/usr/share/nginx/html/src  # Mount source code for better debugging
+      - ./frontend/nginx/logs:/var/log/nginx  # Mount nginx logs directory
+    networks:
+      - shop-network
+
+networks:
+  shop-network:
+    driver: bridge
+
+volumes:
+  db-data:
