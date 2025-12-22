@@ -67,6 +67,7 @@ online-shop/
   - Spring Security with JWT authentication
   - MySQL database with automatic initialization
   - Flyway for database migrations
+  - - **Kafka integration for publishing order events (`order-events` topic)**
 
 - **Frontend**:
   - React with TypeScript
@@ -76,6 +77,7 @@ online-shop/
 - **Infrastructure**:
   - Docker containers for all components
   - Docker Compose for orchestration
+  - **Local Kafka + Zookeeper setup for event-driven communication**
 
 ## Getting Started
 
