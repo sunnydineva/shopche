@@ -10,6 +10,8 @@ import com.shop.model.User;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,6 +94,7 @@ public class OrderMapper {
         Order order = new Order();
         order.setUser(user);
         order.setOrderItems(new ArrayList<>());
+        order.setCreatedAt(LocalDateTime.now());
 
         // Create order items
         for (OrderCreateDTO.OrderItemCreateDTO itemDTO : dto.getItems()) {

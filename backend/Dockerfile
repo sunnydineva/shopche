@@ -15,3 +15,5 @@ COPY --from=build /app/src /app/src
 EXPOSE 8080 5005
 # Add JVM debug options and configure logging
 ENTRYPOINT ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-Dlogging.level.root=DEBUG", "-Dlogging.level.com.shop=DEBUG", "-jar", "app.jar"]
+
+ENV TZ=UTC
