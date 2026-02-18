@@ -1,7 +1,7 @@
 package com.shop.controller;
 
 import com.shop.dto.category.CategoryDTO;
-import com.shop.service.CategoryService;
+import com.shop.service.CategoryServiceClient;
 import com.shop.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +21,11 @@ import java.util.List;
 public class CategoryController {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
-    private final CategoryService categoryService;
+    private final CategoryServiceClient categoryServiceClient;
     private final ProductService productService;
 
-    public CategoryController(CategoryService categoryService, ProductService productService) {
-        this.categoryService = categoryService;
+    public CategoryController(CategoryServiceClient categoryServiceClient, ProductService productService) {
+        this.categoryServiceClient = categoryServiceClient;
         this.productService = productService;
     }
 
@@ -35,7 +35,7 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         logger.info("Fetching all categories");
-        List<CategoryDTO> categories = categoryService.getAllCategories();
+        List<CategoryDTO> categories = categoryServiceClient.getAllCategories();
         return ResponseEntity.ok(categories);
     }
 
@@ -45,7 +45,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
         logger.info("Fetching category with ID: {}", id);
-        CategoryDTO category = categoryService.getCategoryById(id);
+        CategoryDTO category = categoryServiceClient.getCategoryById(id);
         return ResponseEntity.ok(category);
     }
 }

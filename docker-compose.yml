@@ -22,6 +22,28 @@ services:
       timeout: 5s
       retries: 5
 
+  # Category Service Database
+  category-db:
+    image: mysql:8.0
+    container_name: category-service-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: category_service
+      MYSQL_USER: shop_user
+      MYSQL_PASSWORD: shop_password
+    ports:
+      - "3308:3306"
+    volumes:
+      - category-db-data:/var/lib/mysql
+    networks:
+      - shop-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Spring Boot Backend
   backend:
     build:
@@ -99,6 +121,31 @@ services:
     networks:
       - shop-network
 
+  # Category Service
+  category-service:
+    build:
+      context: ./category-service
+      dockerfile: Dockerfile
+    container_name: online-shop-category-service
+    restart: always
+    depends_on:
+      category-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://category-db:3306/category_service?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: shop_user
+      SPRING_DATASOURCE_PASSWORD: shop_password
+      # Debug environment variables
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_COM_SHOP: INFO
+    ports:
+      - "8084:8083"
+      - "5007:5007"  # Expose remote debug port
+    volumes:
+      - ./category-service/src:/app/src  # Mount source code for live debugging
+    networks:
+      - shop-network
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     ports:
@@ -142,3 +189,4 @@ networks:
 
 volumes:
   db-data:
+  category-db-data:

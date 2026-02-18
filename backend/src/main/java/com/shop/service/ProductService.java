@@ -1,5 +1,6 @@
 package com.shop.service;
 
+import com.shop.dto.category.CategoryDTO;
 import com.shop.dto.product.ProductCreateDTO;
 import com.shop.dto.product.ProductDTO;
 import com.shop.dto.product.ProductUpdateDTO;
@@ -7,7 +8,6 @@ import com.shop.exception.ResourceNotFoundException;
 import com.shop.mapper.ProductMapper;
 import com.shop.model.Category;
 import com.shop.model.Product;
-import com.shop.repository.CategoryRepository;
 import com.shop.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +28,14 @@ public class ProductService {
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryServiceClient categoryServiceClient;
     private final ProductMapper productMapper;
 
     public ProductService(ProductRepository productRepository, 
-                         CategoryRepository categoryRepository,
+                         CategoryServiceClient categoryServiceClient,
                          ProductMapper productMapper) {
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
+        this.categoryServiceClient = categoryServiceClient;
         this.productMapper = productMapper;
     }
 
@@ -59,13 +59,13 @@ public class ProductService {
             BigDecimal maxPrice, 
             String name, 
             Pageable pageable) {
-        
+
         logger.info("Fetching products with filters: categoryId={}, minPrice={}, maxPrice={}, name={}", 
                 categoryId, minPrice, maxPrice, name);
-        
+
         Page<Product> products = productRepository.findProductsByFilters(
                 categoryId, minPrice, maxPrice, name, pageable);
-        
+
         return products.map(productMapper::toDTO);
     }
 
@@ -85,13 +85,13 @@ public class ProductService {
     @Transactional(readOnly = true)
     public List<ProductDTO> getProductsByCategoryId(Long categoryId) {
         logger.info("Fetching products by category ID: {}", categoryId);
-        
+
         // Check if category exists
-        if (!categoryRepository.existsById(categoryId)) {
+        if (!categoryServiceClient.existsById(categoryId)) {
             logger.error("Category not found with ID: {}", categoryId);
             throw new ResourceNotFoundException("Category", "id", categoryId);
         }
-        
+
         List<Product> products = productRepository.findByCategoryId(categoryId);
         return productMapper.toDTOList(products);
     }
@@ -102,20 +102,22 @@ public class ProductService {
     @Transactional
     public ProductDTO createProduct(ProductCreateDTO productCreateDTO) {
         logger.info("Creating new product: {}", productCreateDTO.getName());
-        
+
         // Check if category exists
-        Category category = categoryRepository.findById(productCreateDTO.getCategoryId())
-                .orElseThrow(() -> {
-                    logger.error("Category not found with ID: {}", productCreateDTO.getCategoryId());
-                    return new ResourceNotFoundException("Category", "id", productCreateDTO.getCategoryId());
-                });
-        
+        CategoryDTO categoryDTO = categoryServiceClient.getCategoryById(productCreateDTO.getCategoryId());
+
+        // Create a Category entity from the DTO
+        Category category = new Category();
+        category.setId(categoryDTO.getId());
+        category.setName(categoryDTO.getName());
+        category.setDescription(categoryDTO.getDescription());
+
         Product product = productMapper.toEntity(productCreateDTO);
         productMapper.setCategory(product, category);
-        
+
         Product savedProduct = productRepository.save(product);
         logger.info("Product created with ID: {}", savedProduct.getId());
-        
+
         return productMapper.toDTO(savedProduct);
     }
 
@@ -125,25 +127,27 @@ public class ProductService {
     @Transactional
     public ProductDTO updateProduct(Long id, ProductUpdateDTO productUpdateDTO) {
         logger.info("Updating product with ID: {}", id);
-        
+
         Product product = findProductById(id);
-        
+
         // Update category if provided
         if (productUpdateDTO.getCategoryId() != null && 
             (product.getCategory() == null || !product.getCategory().getId().equals(productUpdateDTO.getCategoryId()))) {
-            
-            Category category = categoryRepository.findById(productUpdateDTO.getCategoryId())
-                    .orElseThrow(() -> {
-                        logger.error("Category not found with ID: {}", productUpdateDTO.getCategoryId());
-                        return new ResourceNotFoundException("Category", "id", productUpdateDTO.getCategoryId());
-                    });
-            
+
+            CategoryDTO categoryDTO = categoryServiceClient.getCategoryById(productUpdateDTO.getCategoryId());
+
+            // Create a Category entity from the DTO
+            Category category = new Category();
+            category.setId(categoryDTO.getId());
+            category.setName(categoryDTO.getName());
+            category.setDescription(categoryDTO.getDescription());
+
             productMapper.setCategory(product, category);
         }
-        
+
         productMapper.updateEntity(product, productUpdateDTO);
         Product updatedProduct = productRepository.save(product);
-        
+
         logger.info("Product updated: {}", updatedProduct.getId());
         return productMapper.toDTO(updatedProduct);
     }
@@ -154,11 +158,11 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long id) {
         logger.info("Deactivating product with ID: {}", id);
-        
+
         Product product = findProductById(id);
         product.setIsActive(false);
         productRepository.save(product);
-        
+
         logger.info("Product deactivated: {}", id);
     }
 
