@@ -56,3 +56,4 @@ frontend/*.log
 
 ### Docker ###
 .env
+/frontend/nginx/logs/

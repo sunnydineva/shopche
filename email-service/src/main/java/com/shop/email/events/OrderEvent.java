@@ -1,4 +1,4 @@
-package com.shop.events;
+package com.shop.email.events;
 
 import java.math.BigDecimal;
 
@@ -14,7 +14,6 @@ public class OrderEvent {
     public OrderEvent() {
     }
 
-
     public OrderEvent(Long orderId, Long userId, String userEmail, String status, BigDecimal totalAmount, String createdAt) {
         this.orderId = orderId;
         this.userId = userId;
@@ -24,53 +23,43 @@ public class OrderEvent {
         this.createdAt = createdAt;
     }
 
-    public Long getOrderId()
-    {
+    public Long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(Long orderId)
-    {
+    public void setOrderId(Long orderId) {
         this.orderId = orderId;
     }
 
-    public Long getUserId()
-    {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId)
-    {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public String getStatus()
-    {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status)
-    {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public BigDecimal getTotalAmount()
-    {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(BigDecimal totalAmount)
-    {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 
-    public String getCreatedAt()
-    {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt)
-    {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -82,5 +71,17 @@ public class OrderEvent {
     public void setUserEmail(String userEmail)
     {
         this.userEmail = userEmail;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderEvent{" +
+                "orderId=" + orderId +
+                ", userId=" + userId +
+                ", userEmail=" + userEmail +
+                ", status='" + status + '\'' +
+                ", totalAmount=" + totalAmount +
+                ", createdAt='" + createdAt + '\'' +
+                '}';
     }
 }

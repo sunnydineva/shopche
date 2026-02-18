@@ -162,6 +162,7 @@ public class OrderService {
         OrderEvent event = new OrderEvent(
                 savedOrder.getId(),
                 savedOrder.getUser().getId(),
+                savedOrder.getUser().getEmail(),
                 savedOrder.getStatus().name(),
                 savedOrder.getTotalAmount(),
                 createdAtIso);

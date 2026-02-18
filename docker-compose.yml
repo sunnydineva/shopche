@@ -64,11 +64,38 @@ services:
       GENERATE_SOURCEMAP: "true"
       REACT_APP_DEBUG: "true"
     ports:
-      - "8082:80"
+      - "8083:80"
       - "35729:35729"  # LiveReload port
     volumes:
       - ./frontend/src:/usr/share/nginx/html/src  # Mount source code for better debugging
       - ./frontend/nginx/logs:/var/log/nginx  # Mount nginx logs directory
+    networks:
+      - shop-network
+
+  # Email Service
+  email-service:
+    build:
+      context: ./email-service
+      dockerfile: Dockerfile
+    container_name: online-shop-email-service
+    restart: always
+    depends_on:
+      - kafka
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # Email configuration (for development, using MailHog)
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
+      SPRING_MAIL_USERNAME: 
+      SPRING_MAIL_PASSWORD: 
+      # Debug environment variables
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_COM_SHOP: INFO
+    ports:
+      - "8082:8082"
+      - "5006:5006"  # Expose remote debug port
+    volumes:
+      - ./email-service/src:/app/src  # Mount source code for live debugging
     networks:
       - shop-network
 
@@ -98,6 +125,16 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
     - shop-network
+
+  # MailHog for email testing
+  mailhog:
+    image: mailhog/mailhog
+    container_name: online-shop-mailhog
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI
+    networks:
+      - shop-network
 
 networks:
   shop-network:
