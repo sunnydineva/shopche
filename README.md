@@ -44,6 +44,9 @@ online-shop/
 │   │   └── test/             # Test code
 │   ├── pom.xml               # Maven dependencies
 │   └── Dockerfile            # Backend Docker configuration
+├── ai-service/              # AI microservice (product description & content generation)
+├── category-service/        # Extracted from backend (product categories management)
+├── email-service/           # Sends emails on order events (Kafka consumer)
 ├── frontend/                 # React application
 │   ├── src/                  # Source code
 │   │   ├── App.tsx           # Main React component
@@ -79,6 +82,20 @@ online-shop/
   - Docker Compose for orchestration
   - **Local Kafka + Zookeeper setup for event-driven communication**
 
+## Microservices
+
+The application is gradually evolving into a microservices architecture:
+
+- **ai-service** – AI-based product content generation
+- **category-service** – product categories (extracted from backend)
+- **email-service** – email notifications via Kafka events
+
+### Architecture Vision
+
+The system is evolving from a modular monolith into a microservices-based architecture, with clear separation of concerns between services.
+
+It demonstrates key patterns such as service decomposition, event-driven communication (Kafka), and AI integration as an isolated domain service, with the backend acting as an orchestration layer between services.
+
 ## Getting Started
 
 ### Prerequisites
@@ -90,14 +107,55 @@ online-shop/
 
 ### Environment Configuration
 
-The application uses environment variables for configuration, especially in Docker environments:
+The application uses environment variables for configuration, especially in Docker environments.
+
+#### Setting up Environment Variables
+
+1. **Copy the example environment file**:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit the `.env` file** with your actual values:
+   ```bash
+   # Edit with your preferred editor
+   nano .env
+   # or
+   vim .env
+   ```
+
+3. **Required Variables**:
+   - `OPENAI_API_KEY`: Your OpenAI API key for AI service functionality
+   - `MYSQL_ROOT_PASSWORD`: MySQL root password
+   - `MYSQL_PASSWORD`: Password for the main database user
+   - `CATEGORY_MYSQL_PASSWORD`: Password for the category service database user
+
+#### Environment Variables Reference
 
 - **Database Configuration**:
-  - `SPRING_DATASOURCE_URL`: JDBC URL for the database connection
-  - `SPRING_DATASOURCE_USERNAME`: Database username
-  - `SPRING_DATASOURCE_PASSWORD`: Database password
+  - `MYSQL_ROOT_PASSWORD`: MySQL root password
+  - `MYSQL_DATABASE`: Main database name (default: online_shop)
+  - `MYSQL_USER`: Main database username (default: shop_user)
+  - `MYSQL_PASSWORD`: Main database password
+  - `CATEGORY_MYSQL_DATABASE`: Category service database name (default: category_service)
+  - `CATEGORY_MYSQL_USER`: Category service database username
+  - `CATEGORY_MYSQL_PASSWORD`: Category service database password
+  - `SPRING_DATASOURCE_USERNAME`: Spring datasource username for main service
+  - `SPRING_DATASOURCE_PASSWORD`: Spring datasource password for main service
+  - `CATEGORY_SPRING_DATASOURCE_USERNAME`: Spring datasource username for category service
+  - `CATEGORY_SPRING_DATASOURCE_PASSWORD`: Spring datasource password for category service
 
-These variables are set in the `docker-compose.yml` file for Docker environments. For local development, default values are provided in `application.properties`.
+- **AI Service Configuration**:
+  - `OPENAI_API_KEY`: Your OpenAI API key for product description and social post generation
+
+- **Security Configuration** (Optional):
+  - `JWT_SECRET`: JWT secret key for token signing (for production environments)
+
+- **Email Configuration** (Optional):
+  - `SPRING_MAIL_USERNAME`: Email service username (leave empty for MailHog development setup)
+  - `SPRING_MAIL_PASSWORD`: Email service password (leave empty for MailHog development setup)
+
+> **Note**: The `.env` file is already included in `.gitignore` and will not be committed to version control. Always use the `.env.example` file as a template and never commit sensitive credentials.
 
 ### Running the Application
 

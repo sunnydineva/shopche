@@ -1,0 +1,8 @@
+/home/sunny/ss/projects/test/online-shop/ai-service/src/main/java/com/shop/ai/dto/GenerateSocialPostRequest.java
+/home/sunny/ss/projects/test/online-shop/ai-service/src/main/java/com/shop/ai/dto/GenerateDescriptionResponse.java
+/home/sunny/ss/projects/test/online-shop/ai-service/src/main/java/com/shop/ai/service/OpenAiService.java
+/home/sunny/ss/projects/test/online-shop/ai-service/src/main/java/com/shop/ai/dto/GenerateDescriptionRequest.java
+/home/sunny/ss/projects/test/online-shop/ai-service/src/main/java/com/shop/ai/service/RateLimitService.java
+/home/sunny/ss/projects/test/online-shop/ai-service/src/main/java/com/shop/ai/AiServiceApplication.java
+/home/sunny/ss/projects/test/online-shop/ai-service/src/main/java/com/shop/ai/dto/GenerateSocialPostResponse.java
+/home/sunny/ss/projects/test/online-shop/ai-service/src/main/java/com/shop/ai/controller/AiController.java

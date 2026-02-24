@@ -1,0 +1,8 @@
+com/shop/ai/service/OpenAiService.class
+com/shop/ai/AiServiceApplication.class
+com/shop/ai/dto/GenerateSocialPostResponse.class
+com/shop/ai/dto/GenerateSocialPostRequest.class
+com/shop/ai/service/RateLimitService.class
+com/shop/ai/controller/AiController.class
+com/shop/ai/dto/GenerateDescriptionRequest.class
+com/shop/ai/dto/GenerateDescriptionResponse.class

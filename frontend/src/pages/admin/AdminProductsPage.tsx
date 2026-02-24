@@ -6,6 +6,7 @@ import Input from '../../components/common/Input';
 import { useAuth } from '../../hooks/useAuth';
 import productService from '../../services/productService';
 import categoryService from '../../services/categoryService';
+import aiService from '../../services/aiService';
 import { Product, Category, PageRequest, ProductCreateRequest, ProductUpdateRequest, Currency } from '../../types/models';
 
 const AdminProductsPage = () => {
@@ -39,6 +40,10 @@ const AdminProductsPage = () => {
     imageUrl: '',
     categoryId: 0
   });
+
+  // AI generation loading states
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const [isGeneratingPost, setIsGeneratingPost] = useState(false);
 
   // Redirect if not authenticated or not admin
   useEffect(() => {
@@ -188,6 +193,73 @@ const AdminProductsPage = () => {
     });
     setIsEditing(true);
     setIsCreating(false);
+  };
+
+  // Handle AI description generation
+  const handleGenerateDescription = async () => {
+    if (!formData.name || !formData.categoryId || !formData.price) {
+      setError('Please fill in product name, category, and price before generating description.');
+      return;
+    }
+
+    try {
+      setIsGeneratingDescription(true);
+      setError(null);
+
+      const payload = {
+        name: formData.name,
+        categoryId: formData.categoryId,
+        price: formData.price,
+        currency: formData.currency,
+        imageUrl: formData.imageUrl || undefined,
+        currentDescription: formData.description || undefined
+      };
+
+      const response = await aiService.generateProductDescription(payload);
+
+      setFormData({
+        ...formData,
+        description: response.description
+      });
+    } catch (err) {
+      console.error('Error generating description:', err);
+      setError('Failed to generate description. Please try again later.');
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
+
+  // Handle AI social post generation
+  const handleGenerateSocialPost = async () => {
+    if (!formData.name || !formData.categoryId || !formData.price) {
+      setError('Please fill in product name, category, and price before generating social post.');
+      return;
+    }
+
+    try {
+      setIsGeneratingPost(true);
+      setError(null);
+
+      const payload = {
+        name: formData.name,
+        categoryId: formData.categoryId,
+        price: formData.price,
+        currency: formData.currency,
+        imageUrl: formData.imageUrl || undefined,
+        currentDescription: formData.description || undefined
+      };
+
+      const response = await aiService.generateSocialPost(payload);
+
+      // For now, we'll show the social post in an alert
+      // In a real app, you might want to open a modal or copy to clipboard
+      alert(`Generated Social Post:\n\n${response.socialPost}`);
+    } catch (err) {
+      console.error('Error generating social post:', err);
+      setError('Failed to generate social post. Please try again later.');
+    } finally {
+      setIsGeneratingPost(false);
+    }
   };
 
   // Handle pagination
@@ -369,7 +441,29 @@ const AdminProductsPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description
               </label>
-              <textarea
+
+
+              <div className="flex gap-2 mb-2">
+                <Button
+                    variant="outline"
+                    type="button"
+                    onClick={handleGenerateDescription}
+                    disabled={isGeneratingDescription || isGeneratingPost}
+                >
+                  {isGeneratingDescription ? '⏳ Генерира...' : '✨ Генерирай описание'}
+                </Button>
+
+                <Button
+                    variant="outline"
+                    type="button"
+                    onClick={handleGenerateSocialPost}
+                    disabled={isGeneratingDescription || isGeneratingPost}
+                >
+                  {isGeneratingPost ? '⏳ Генерира...' : '✨ Генерирай пост'}
+                </Button>
+              </div>
+
+          <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
