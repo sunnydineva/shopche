@@ -318,6 +318,7 @@ The application exposes remote debugging ports for each microservice. You can at
 This is a skeleton project with minimal functionality. Next steps for development:
 
 1. Switch to microservice architecture - in progress
+2. Add observability with distributed tracing and metrics using Spring Boot Actuator, Micrometer, and OpenTelemetry - like in backend service
 2. Implement payment integration
 2. Enhance UI with better styling and user experience
 3. Integrate with my separate  **User Service** (separate Spring Boot microservice) for centralized user management.

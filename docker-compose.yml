@@ -54,12 +54,20 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      jaeger:
+        condition: service_started
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      # OpenTelemetry Configuration
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
+      OTEL_SERVICE_NAME: online-shop-backend
+      OTEL_SERVICE_VERSION: 0.0.1-SNAPSHOT
+      OTEL_RESOURCE_ATTRIBUTES: service.name=online-shop-backend,service.version=0.0.1-SNAPSHOT,deployment.environment=development
+      DEPLOYMENT_ENVIRONMENT: development
       # Debug environment variables
       LOGGING_LEVEL_ROOT: DEBUG
       LOGGING_LEVEL_COM_SHOP: DEBUG
@@ -204,6 +212,21 @@ services:
     ports:
       - "1025:1025" # SMTP server
       - "8025:8025" # Web UI
+    networks:
+      - shop-network
+
+  # Jaeger for distributed tracing - http://localhost:16686
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: online-shop-jaeger
+    restart: always
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "14268:14268" # Jaeger collector HTTP
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
     networks:
       - shop-network
 

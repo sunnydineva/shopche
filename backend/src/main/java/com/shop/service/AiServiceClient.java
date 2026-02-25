@@ -7,7 +7,6 @@ import com.shop.dto.ai.GenerateSocialPostRequest;
 import com.shop.dto.ai.GenerateSocialPostResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -41,7 +40,7 @@ public class AiServiceClient {
             GenerateDescriptionResponse response = aiClient.generateDescription(request, requestId).getBody();
             logger.info("Successfully generated description for product: {} with requestId: {}", 
                     request.getProductName(), requestId);
-            return ResponseEntity.ok(response).getBody();
+            return response;
         } catch (Exception e) {
             logger.error("Error generating description for product: {} with requestId: {}", 
                     request.getProductName(), requestId, e);
