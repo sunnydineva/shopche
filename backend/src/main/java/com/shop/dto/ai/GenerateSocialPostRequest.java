@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class GenerateSocialPostRequest {
     @NotBlank(message = "Product name is required")
-    private String name;
+    private String productName;
 
     @NotNull(message = "Category ID is required")
     private Long categoryId;
@@ -33,19 +33,19 @@ public class GenerateSocialPostRequest {
 
     // Constructor
     public GenerateSocialPostRequest(String name, Long categoryId, BigDecimal price, String currency) {
-        this.name = name;
+        this.productName = name;
         this.categoryId = categoryId;
         this.price = price;
         this.currency = currency;
     }
 
     // Getters and setters
-    public String getName() {
-        return name;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public Long getCategoryId() {

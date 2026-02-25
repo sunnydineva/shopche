@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.kafka.core.KafkaTemplate;
+//import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,17 +38,17 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
-    private final KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate;
+//    private final KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate;
 
     public OrderService(OrderRepository orderRepository,
                        UserRepository userRepository,
-                       ProductRepository productRepository,
-                       OrderMapper orderMapper, KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate) {
+                       ProductRepository productRepository, OrderMapper orderMapper) {
+//                       , KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.orderMapper = orderMapper;
-        this.orderEventKafkaTemplate = orderEventKafkaTemplate;
+//        this.orderEventKafkaTemplate = orderEventKafkaTemplate;
     }
 
     /**
@@ -170,7 +170,7 @@ public class OrderService {
       //  orderEventKafkaTemplate.send("order-events", order.getId().toString(), event);
 
         try {
-            orderEventKafkaTemplate.send("order-events", savedOrder.getId().toString(), event);
+//            orderEventKafkaTemplate.send("order-events", savedOrder.getId().toString(), event);
             logger.info("Kafka event sent for order {}", savedOrder.getId());
         } catch (Exception e) {
 

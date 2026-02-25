@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.client.HttpClientErrorException;
+
 import java.util.UUID;
 
 /**
@@ -42,7 +44,7 @@ public class AiController {
         }
 
         logger.info("Received request to generate description for product: {} with requestId: {}", 
-                request.getName(), requestId);
+                request.getProductName(), requestId);
 
         try {
             GenerateDescriptionResponse response = aiServiceClient.generateDescription(request, requestId);
@@ -79,7 +81,7 @@ public class AiController {
         }
 
         logger.info("Received request to generate social post for product: {} with requestId: {}", 
-                request.getName(), requestId);
+                request.getProductName(), requestId);
 
         try {
             GenerateSocialPostResponse response = aiServiceClient.generateSocialPost(request, requestId);

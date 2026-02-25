@@ -149,7 +149,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Laptop Pro",
                     "High-performance laptop with 16GB RAM and 512GB SSD",
                     new BigDecimal("1299.99"),
-                    Currency.USD,
+                    Currency.EUR,
                     50
             );
             laptop.setCategory(electronics);
@@ -160,7 +160,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Smartphone X",
                     "Latest smartphone with 6.5-inch display and 128GB storage",
                     new BigDecimal("899.99"),
-                    Currency.USD,
+                    Currency.EUR,
                     100
             );
             smartphone.setCategory(electronics);
@@ -171,7 +171,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Noise-Cancelling Headphones",
                     "Premium wireless headphones with active noise cancellation",
                     new BigDecimal("249.99"),
-                    Currency.USD,
+                    Currency.EUR,
                     75
             );
             headphones.setCategory(electronics);
@@ -187,7 +187,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Cotton T-Shirt",
                     "Comfortable 100% cotton t-shirt in various colors",
                     new BigDecimal("19.99"),
-                    Currency.USD,
+                    Currency.EUR,
                     200
             );
             tShirt.setCategory(clothing);
@@ -197,7 +197,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Slim Fit Jeans",
                     "Classic slim fit jeans in dark blue",
                     new BigDecimal("49.99"),
-                    Currency.USD,
+                    Currency.EUR,
                     150
             );
             jeans.setCategory(clothing);
@@ -213,7 +213,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Bestseller Novel",
                     "Award-winning fiction novel by a renowned author",
                     new BigDecimal("24.99"),
-                    Currency.USD,
+                    Currency.EUR,
                     100
             );
             novel.setCategory(books);
@@ -223,7 +223,7 @@ public class DataInitializer implements CommandLineRunner {
                     "Gourmet Cookbook",
                     "Collection of gourmet recipes from around the world",
                     new BigDecimal("34.99"),
-                    Currency.USD,
+                    Currency.EUR,
                     80
             );
             cookbook.setCategory(books);

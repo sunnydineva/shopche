@@ -1,8 +1,22 @@
-FROM openjdk:17-jdk-slim
-
+# =========================
+# Build stage (Maven)
+# =========================
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-COPY target/category-service-0.0.1-SNAPSHOT.jar app.jar
+COPY pom.xml .
+RUN mvn -q dependency:go-offline
+
+COPY src ./src
+RUN mvn -q clean package -DskipTests
+
+# =========================
+# Run stage (JRE)
+# =========================
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+
+COPY --from=build /app/target/*-SNAPSHOT.jar app.jar
 
 EXPOSE 8083
 EXPOSE 5007

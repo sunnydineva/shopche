@@ -4,7 +4,7 @@ import api from './api';
  * Request payload for AI product description generation
  */
 export interface GenerateDescriptionRequest {
-  name: string;
+  productName: string;
   categoryId: number;
   price: number;
   currency: string;
@@ -18,7 +18,7 @@ export interface GenerateDescriptionRequest {
  * Request payload for AI social post generation
  */
 export interface GenerateSocialPostRequest {
-  name: string;
+  productName: string;
   categoryId: number;
   price: number;
   currency: string;
@@ -39,7 +39,12 @@ export interface GenerateDescriptionResponse {
  * Response for AI social post generation
  */
 export interface GenerateSocialPostResponse {
-  socialPost: string;
+  requestId: string;
+  caption: string;
+  hashtags: string[];
+  fullText: string;
+  tokensUsed?: number;
+  timestamp?: string;
 }
 
 /**

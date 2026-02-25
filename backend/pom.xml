@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.shop</groupId>
-    <artifactId>online-shop-backend</artifactId>
+    <artifactId>online-shop-backend-for-frontend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>online-shop-backend</name>
     <description>Backend for Online Shop Application</description>
@@ -80,10 +80,10 @@
             <scope>runtime</scope>
         </dependency>
 
-        <dependency>
+      <!--  <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>

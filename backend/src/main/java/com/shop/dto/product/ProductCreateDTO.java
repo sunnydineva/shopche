@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 public class ProductCreateDTO {
 
     @NotBlank(message = "Product name is required")
-    private String name;
+    private String productName;
 
     private String description;
 
@@ -40,11 +40,11 @@ public class ProductCreateDTO {
 
     // Getters and Setters
     public String getName() {
-        return name;
+        return productName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.productName = name;
     }
 
     public String getDescription() {

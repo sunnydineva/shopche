@@ -12,7 +12,7 @@ public class GenerateSocialPostRequest {
 
     private String productDescription;
 
-    @NotBlank(message = "Platform is required")
+//    @NotBlank(message = "Platform is required")
     private String platform; // instagram, facebook
 
     private String tone; // casual, professional, exciting

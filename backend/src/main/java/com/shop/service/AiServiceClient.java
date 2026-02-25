@@ -7,6 +7,7 @@ import com.shop.dto.ai.GenerateSocialPostRequest;
 import com.shop.dto.ai.GenerateSocialPostResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -32,18 +33,18 @@ public class AiServiceClient {
         if (requestId == null || requestId.trim().isEmpty()) {
             requestId = UUID.randomUUID().toString();
         }
-        
+
         logger.info("Generating product description for product: {} with requestId: {}", 
-                request.getName(), requestId);
-        
+                request.getProductName(), requestId);
+
         try {
             GenerateDescriptionResponse response = aiClient.generateDescription(request, requestId).getBody();
             logger.info("Successfully generated description for product: {} with requestId: {}", 
-                    request.getName(), requestId);
-            return response;
+                    request.getProductName(), requestId);
+            return ResponseEntity.ok(response).getBody();
         } catch (Exception e) {
             logger.error("Error generating description for product: {} with requestId: {}", 
-                    request.getName(), requestId, e);
+                    request.getProductName(), requestId, e);
             throw new RuntimeException("Failed to generate product description: " + e.getMessage(), e);
         }
     }
@@ -55,18 +56,19 @@ public class AiServiceClient {
         if (requestId == null || requestId.trim().isEmpty()) {
             requestId = UUID.randomUUID().toString();
         }
-        
+
         logger.info("Generating social post for product: {} with requestId: {}", 
-                request.getName(), requestId);
-        
+                request.getProductName(), requestId);
+
         try {
             GenerateSocialPostResponse response = aiClient.generateSocialPost(request, requestId).getBody();
+
             logger.info("Successfully generated social post for product: {} with requestId: {}", 
-                    request.getName(), requestId);
+                    request.getProductName(), requestId);
             return response;
         } catch (Exception e) {
             logger.error("Error generating social post for product: {} with requestId: {}", 
-                    request.getName(), requestId, e);
+                    request.getProductName(), requestId, e);
             throw new RuntimeException("Failed to generate social post: " + e.getMessage(), e);
         }
     }

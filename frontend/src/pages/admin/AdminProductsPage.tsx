@@ -35,7 +35,7 @@ const AdminProductsPage = () => {
     name: '',
     description: '',
     price: 0,
-    currency: 'USD',
+    currency: 'EUR',
     stockQuantity: 0,
     imageUrl: '',
     categoryId: 0
@@ -144,7 +144,7 @@ const AdminProductsPage = () => {
         name: '',
         description: '',
         price: 0,
-        currency: 'USD',
+        currency: 'EUR',
         stockQuantity: 0,
         imageUrl: '',
         categoryId: 0
@@ -206,11 +206,15 @@ const AdminProductsPage = () => {
       setIsGeneratingDescription(true);
       setError(null);
 
+      const currency: string = ('currency' in formData && typeof formData.currency === 'string')
+          ? formData.currency
+          : 'EUR';
+
       const payload = {
-        name: formData.name,
+        productName: formData.name,
         categoryId: formData.categoryId,
         price: formData.price,
-        currency: formData.currency,
+        currency,
         imageUrl: formData.imageUrl || undefined,
         currentDescription: formData.description || undefined
       };
@@ -240,20 +244,39 @@ const AdminProductsPage = () => {
       setIsGeneratingPost(true);
       setError(null);
 
+      const currency2: string = ('currency' in formData && typeof formData.currency === 'string')
+          ? formData.currency
+          : 'EUR';
+
       const payload = {
-        name: formData.name,
+        productName: formData.name,
         categoryId: formData.categoryId,
         price: formData.price,
-        currency: formData.currency,
+        currency: currency2,
         imageUrl: formData.imageUrl || undefined,
         currentDescription: formData.description || undefined
       };
 
       const response = await aiService.generateSocialPost(payload);
 
-      // For now, we'll show the social post in an alert
-      // In a real app, you might want to open a modal or copy to clipboard
-      alert(`Generated Social Post:\n\n${response.socialPost}`);
+      // // For now, we'll show the social post in an alert
+      // // In a real app, you might want to open a modal or copy to clipboard
+      // alert(`Generated Social Post:\n\n${response.fullText}`);
+
+      // in the description field at the moment, later will be posted directly
+      // const caption = response.caption?.trim() || '';
+      // const hashtags = (response.hashtags || []).join(' #');
+      //
+      // const formattedText =
+      //     `📢 Пост: ${caption}
+      //      🏷️ Хаштагове: ${hashtags}`;
+
+      setFormData({
+        ...formData,
+        // description: response.fullText || formattedText
+        description: response.fullText
+      });
+
     } catch (err) {
       console.error('Error generating social post:', err);
       setError('Failed to generate social post. Please try again later.');
@@ -297,7 +320,7 @@ const AdminProductsPage = () => {
               name: '',
               description: '',
               price: 0,
-              currency: 'USD',
+              currency: 'EUR',
               stockQuantity: 0,
               imageUrl: '',
               categoryId: 0
