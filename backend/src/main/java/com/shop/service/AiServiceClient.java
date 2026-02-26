@@ -7,6 +7,7 @@ import com.shop.dto.ai.GenerateSocialPostRequest;
 import com.shop.dto.ai.GenerateSocialPostResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -51,7 +52,8 @@ public class AiServiceClient {
     /**
      * Generate social media post using AI
      */
-    public GenerateSocialPostResponse generateSocialPost(GenerateSocialPostRequest request, String requestId) {
+    public ResponseEntity<?> generateSocialPost(GenerateSocialPostRequest request, String requestId) {
+    //public GenerateSocialPostResponse generateSocialPost(GenerateSocialPostRequest request, String requestId) {
         if (requestId == null || requestId.trim().isEmpty()) {
             requestId = UUID.randomUUID().toString();
         }
@@ -60,11 +62,11 @@ public class AiServiceClient {
                 request.getProductName(), requestId);
 
         try {
-            GenerateSocialPostResponse response = aiClient.generateSocialPost(request, requestId).getBody();
+            //GenerateSocialPostResponse response = aiClient.generateSocialPost(request, requestId).getBody();
 
             logger.info("Successfully generated social post for product: {} with requestId: {}", 
                     request.getProductName(), requestId);
-            return response;
+            return aiClient.generateSocialPost(request, requestId);
         } catch (Exception e) {
             logger.error("Error generating social post for product: {} with requestId: {}", 
                     request.getProductName(), requestId, e);

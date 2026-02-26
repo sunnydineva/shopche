@@ -80,25 +80,23 @@ public class AiController {
             requestId = UUID.randomUUID().toString();
         }
 
-        logger.info("Received request to generate social post for product: {} with requestId: {}", 
+        logger.info("Received request to generate social post for product: {} with requestId: {}",
                 request.getProductName(), requestId);
 
         try {
-            GenerateSocialPostResponse response = aiServiceClient.generateSocialPost(request, requestId);
+           // GenerateSocialPostResponse response = aiServiceClient.generateSocialPost(request, requestId);
             logger.info("Successfully processed social post generation request with requestId: {}", requestId);
-            return ResponseEntity.ok(response);
+            return aiServiceClient.generateSocialPost(request, requestId);
+
+
+        } catch (feign.FeignException e)
+        {
+            // ai-service 4xx/5xx ->
+            return ResponseEntity.status(e.status())
+                    .body(e.contentUTF8());
 
         } catch (Exception e) {
             logger.error("Failed to generate social post with requestId: {}", requestId, e);
-
-            // Return 502 Bad Gateway for service communication errors
-            if (e.getCause() instanceof java.net.ConnectException || 
-                e.getCause() instanceof java.net.SocketTimeoutException) {
-                return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
-                        .body("AI service is temporarily unavailable");
-            }
-
-            // Return 503 Service Unavailable for other service errors
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body("Unable to process AI request at this time");
         }
