@@ -1,6 +1,6 @@
 package com.shop.email.listener;
 
-import com.shop.email.events.OrderEvent;
+import com.shop.events.avro.OrderEvent;
 import com.shop.email.service.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class OrderEventsListener {
         this.emailService = emailService;
     }
 
-    @KafkaListener(topics = "order-events", groupId = "notification-service")// в отделна consumer group, за да получава всички събития независимо от други listener-и.
+    @KafkaListener(topics = "order-events-avro", groupId = "notification-service")// в отделна consumer group, за да получава всички събития независимо от други listener-и.
     public void handleOrderEvent(OrderEvent event) {
         log.info("Received order kafka event: id={}, userId={}, email={}, status={}, total={}",
                 event.getOrderId(),
@@ -40,7 +40,7 @@ public class OrderEventsListener {
                "Order Details:\n" +
                "- Order ID: " + event.getOrderId() + "\n" +
                "- Status: " + event.getStatus() + "\n" +
-               "- Total Amount: $" + event.getTotalAmount() + "\n" +
+               "- Total Amount: $" + String.format("%.2f", event.getTotalAmount()) + "\n" +
                "- Created At: " + event.getCreatedAt() + "\n\n" +
                "Thank you for shopping with us!\n\n" +
                "Best regards,\n" +

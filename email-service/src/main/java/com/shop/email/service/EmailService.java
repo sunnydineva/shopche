@@ -24,9 +24,12 @@ public class EmailService {
     public void sendOrderConfirmationEmail(String to, String subject, String body) {
         try {
             log.info("Sending order confirmation email to: {}", to);
-            
+            String resolvedFrom = (fromEmail == null || fromEmail.isBlank())
+                    ? "noreply@shop.com"
+                    : fromEmail.trim();
+
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
+            message.setFrom(resolvedFrom);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);

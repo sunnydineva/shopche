@@ -1,13 +1,14 @@
+# syntax=docker/dockerfile:1.4
 # Build stage
 FROM node:18-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN --mount=type=cache,target=/root/.npm npm install
 COPY . .
 # Enable source maps and debugging
 ENV NODE_ENV=production
 ENV GENERATE_SOURCEMAP=true
-RUN npm install -g typescript && npm run build
+RUN --mount=type=cache,target=/root/.npm npm install -g typescript && npm run build
 
 # Production stage
 FROM nginx:alpine
