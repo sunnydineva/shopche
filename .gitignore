@@ -34,11 +34,15 @@ bin/
 
 ### Backend ###
 backend/target/
+ai-service/target/
+category-service/target/
+email-service/target/
 backend/.mvn/
 backend/mvnw
 backend/mvnw.cmd
 
 ### Frontend ###
+frontend/nginx/logs
 frontend/node_modules/
 frontend/dist/
 frontend/dist-ssr/
