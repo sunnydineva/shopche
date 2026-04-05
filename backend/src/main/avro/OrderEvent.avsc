@@ -1,0 +1,41 @@
+{
+  "type": "record",
+  "name": "OrderEvent",
+  "namespace": "com.shop.events.avro",
+  "fields": [
+    {
+      "name": "orderId",
+      "type": "long"
+    },
+    {
+      "name": "userId",
+      "type": "long"
+    },
+    {
+      "name": "userEmail",
+      "type": "string"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "OrderStatus",
+        "symbols": [
+          "NEW",
+          "PAID",
+          "SHIPPED",
+          "DELIVERED",
+          "CANCELED"
+        ]
+      }
+    },
+    {
+      "name": "totalAmount",
+      "type": "double"
+    },
+    {
+      "name": "createdAt",
+      "type": "string"
+    }
+  ]
+}

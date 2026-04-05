@@ -171,11 +171,19 @@ Shop Backend (Spring Boot)  — BFF / Orchestrator
 
 1. Clone the repository
 2. Navigate to the project root directory
-3. Run the application using Docker Compose:
+3. Start everything with Docker Compose (this runs all Spring Boot services inside containers):
 
 ```bash
 docker compose up -d
 ```
+
+To stop:
+
+```bash
+docker compose down
+```
+
+After startup, open the frontend at `http://localhost:8083`.
 
 ### Demo Users
 
@@ -326,7 +334,7 @@ This is a skeleton project with minimal functionality. Next steps for developmen
 
 ## License
 
-© 2025 Soft Protect Ltd. All rights reserved.
+© 2026 Soft Protect Ltd. All rights reserved.
 
 This repository is provided for demonstration and portfolio purposes only.  
 Unauthorised copying, modification or redistribution is not permitted.

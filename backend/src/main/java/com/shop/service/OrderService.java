@@ -3,7 +3,7 @@ package com.shop.service;
 import com.shop.dto.order.OrderCreateDTO;
 import com.shop.dto.order.OrderDTO;
 import com.shop.dto.order.OrderStatusUpdateDTO;
-import com.shop.events.OrderEvent;
+import com.shop.events.avro.OrderEvent;
 import com.shop.exception.ResourceNotFoundException;
 import com.shop.mapper.OrderMapper;
 import com.shop.model.Order;
@@ -17,7 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-//import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,17 +39,17 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
-//    private final KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate;
+    private final KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate;
 
     public OrderService(OrderRepository orderRepository,
                        UserRepository userRepository,
-                       ProductRepository productRepository, OrderMapper orderMapper) {
-//                       , KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate) {
+                       ProductRepository productRepository, OrderMapper orderMapper,
+                       @Qualifier("orderEventKafkaTemplate") KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.orderMapper = orderMapper;
-//        this.orderEventKafkaTemplate = orderEventKafkaTemplate;
+        this.orderEventKafkaTemplate = orderEventKafkaTemplate;
     }
 
     /**
@@ -159,18 +160,17 @@ public class OrderService {
                 ? savedOrder.getCreatedAt().atOffset(ZoneOffset.UTC).toString()
                 : java.time.OffsetDateTime.now(ZoneOffset.UTC).toString();
 
-        OrderEvent event = new OrderEvent(
-                savedOrder.getId(),
-                savedOrder.getUser().getId(),
-                savedOrder.getUser().getEmail(),
-                savedOrder.getStatus().name(),
-                savedOrder.getTotalAmount(),
-                createdAtIso);
-
-      //  orderEventKafkaTemplate.send("order-events", order.getId().toString(), event);
+        OrderEvent event = OrderEvent.newBuilder()
+                .setOrderId(savedOrder.getId())
+                .setUserId(savedOrder.getUser().getId())
+                .setUserEmail(savedOrder.getUser().getEmail())
+                .setStatus(com.shop.events.avro.OrderStatus.valueOf(savedOrder.getStatus().name()))
+                .setTotalAmount(savedOrder.getTotalAmount().doubleValue())
+                .setCreatedAt(createdAtIso)
+                .build();
 
         try {
-//            orderEventKafkaTemplate.send("order-events", savedOrder.getId().toString(), event);
+            orderEventKafkaTemplate.send("order-events-avro", savedOrder.getId().toString(), event);
             logger.info("Kafka event sent for order {}", savedOrder.getId());
         } catch (Exception e) {
 
