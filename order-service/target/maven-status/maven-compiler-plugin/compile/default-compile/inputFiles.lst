@@ -1,0 +1,16 @@
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/dto/OrderCreateDTO.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/service/OrderService.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/OrderServiceApplication.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/controller/OrderController.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/repository/CategoryRepository.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/repository/OrderRepository.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/service/CategoryService.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/dto/OrderStatusUpdateDTO.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/model/Order.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/exception/ResourceNotFoundException.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/dto/OrderDTO.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/repository/OrderItemRepository.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/order/model/OrderItem.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/mapper/OrderMapper.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/events/OrderEventsListener.java
+/home/sunny/ss/projects/test/online-shop/order-service/src/main/java/com/shop/config/KafkaConfig.java

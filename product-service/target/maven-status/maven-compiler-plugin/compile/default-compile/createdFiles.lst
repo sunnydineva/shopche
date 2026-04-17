@@ -1,0 +1,14 @@
+com/shop/product/model/Product.class
+com/shop/product/client/CategoryClient.class
+com/shop/product/ProductServiceApplication.class
+com/shop/product/dto/ProductDTO.class
+com/shop/product/service/ProductService.class
+com/shop/product/model/enums/Currency.class
+com/shop/product/controller/ProductController.class
+com/shop/product/dto/CategoryDTO.class
+com/shop/product/mapper/ProductMapper.class
+com/shop/product/dto/ProductUpdateDTO.class
+com/shop/product/exception/ResourceNotFoundException.class
+com/shop/product/service/CategoryServiceClient.class
+com/shop/product/dto/ProductCreateDTO.class
+com/shop/product/repository/ProductRepository.class

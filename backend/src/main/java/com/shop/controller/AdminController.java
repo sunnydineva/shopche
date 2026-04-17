@@ -5,8 +5,9 @@ import com.shop.dto.order.OrderStatusUpdateDTO;
 import com.shop.dto.product.ProductCreateDTO;
 import com.shop.dto.product.ProductDTO;
 import com.shop.dto.product.ProductUpdateDTO;
-import com.shop.service.OrderService;
-import com.shop.service.ProductService;
+import com.shop.service.CategoryServiceClient;
+import com.shop.service.OrderServiceClient;
+import com.shop.service.ProductServiceClient;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +29,12 @@ import java.util.Map;
 public class AdminController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
-    private final ProductService productService;
-    private final OrderService orderService;
+    private final ProductServiceClient productService;
+    private final OrderServiceClient orderServiceClient;
 
-    public AdminController(ProductService productService, OrderService orderService) {
+    public AdminController(ProductServiceClient productService, OrderServiceClient orderServiceClient) {
         this.productService = productService;
-        this.orderService = orderService;
+        this.orderServiceClient = orderServiceClient;
     }
 
     /**
@@ -62,6 +63,8 @@ public class AdminController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
 
         Page<ProductDTO> products = productService.getAllProducts(pageable);
+//        Page<ProductDTO> products = orderServiceClient.getAllProducts(pageable);
+
         return ResponseEntity.ok(products);
     }
 
@@ -72,6 +75,7 @@ public class AdminController {
     public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductCreateDTO productCreateDTO) {
         logger.info("Admin creating new product: {}", productCreateDTO.getName());
         ProductDTO createdProduct = productService.createProduct(productCreateDTO);
+//        ProductDTO createdProduct = orderServiceClient.createProduct(productCreateDTO);
         return ResponseEntity.ok(createdProduct);
     }
 
@@ -116,7 +120,7 @@ public class AdminController {
         Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
 
-        Page<OrderDTO> orders = orderService.getAllOrders(pageable);
+        Page<OrderDTO> orders = orderServiceClient.getAllOrders(pageable);
         return ResponseEntity.ok(orders);
     }
 
@@ -129,7 +133,7 @@ public class AdminController {
             @Valid @RequestBody OrderStatusUpdateDTO statusUpdateDTO) {
 
         logger.info("Admin updating status for order ID: {} to {}", id, statusUpdateDTO.getStatus());
-        OrderDTO updatedOrder = orderService.updateOrderStatus(id, statusUpdateDTO);
+        OrderDTO updatedOrder = orderServiceClient.updateOrderStatus(id, statusUpdateDTO);
         return ResponseEntity.ok(updatedOrder);
     }
 }

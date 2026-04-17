@@ -1,2 +1,5 @@
--- Drop foreign key to categories (moved to category microservice)
-ALTER TABLE products DROP FOREIGN KEY products_ibfk_1;
+-- Cleanup migration for the extracted services.
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS categories;

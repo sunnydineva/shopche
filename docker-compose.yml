@@ -44,6 +44,50 @@ services:
       timeout: 5s
       retries: 5
 
+  # Product Service Database
+  product-db:
+    image: mysql:8.0
+    container_name: product-service-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${PRODUCT_MYSQL_DATABASE}
+      MYSQL_USER: ${PRODUCT_MYSQL_USER}
+      MYSQL_PASSWORD: ${PRODUCT_MYSQL_PASSWORD}
+    ports:
+      - "3309:3306"
+    volumes:
+      - product-db-data:/var/lib/mysql
+    networks:
+      - shop-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Order Service Database
+  order-db:
+    image: mysql:8.0
+    container_name: order-service-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${ORDER_MYSQL_DATABASE}
+      MYSQL_USER: ${ORDER_MYSQL_USER}
+      MYSQL_PASSWORD: ${ORDER_MYSQL_PASSWORD}
+    ports:
+      - "3310:3306"
+    volumes:
+      - order-db-data:/var/lib/mysql
+    networks:
+      - shop-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Spring Boot Backend
   backend:
     build:
@@ -80,6 +124,33 @@ services:
       - "5005:5005"  # Expose remote debug port
     volumes:
       - ./backend/src:/app/src  # Mount source code for live debugging
+    networks:
+      - shop-network
+
+  # Product Service
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: online-shop-product-service
+    restart: always
+    depends_on:
+      product-db:
+        condition: service_healthy
+      category-service:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://product-db:3306/${PRODUCT_MYSQL_DATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${PRODUCT_SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${PRODUCT_SPRING_DATASOURCE_PASSWORD}
+      CATEGORY_SERVICE_URL: http://category-service:8083
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_COM_SHOP: INFO
+    ports:
+      - "8086:8084"
+      - "5009:5009"
+    volumes:
+      - ./product-service/src:/app/src
     networks:
       - shop-network
 
@@ -160,13 +231,42 @@ services:
     networks:
       - shop-network
 
+  # Order Service
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: online-shop-order-service
+    restart: always
+    depends_on:
+      order-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://order-db:3306/${ORDER_MYSQL_DATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${ORDER_SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${ORDER_SPRING_DATASOURCE_PASSWORD}
+      # Debug environment variables
+      LOGGING_LEVEL_ROOT: INFO
+      LOGGING_LEVEL_COM_SHOP: INFO
+    ports:
+      - "8085:8083"
+      - "5010:5007"  # Expose remote debug port
+    volumes:
+      - ./order-service/src:/app/src  # Mount source code for live debugging
+    networks:
+      - shop-network
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
+    restart: unless-stopped
     ports:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-log:/var/lib/zookeeper/log
     healthcheck:
       test: ["CMD", "sh", "-c", "echo srvr | nc -w 2 localhost 2181 | grep -q 'Mode:'"]
       interval: 10s
@@ -178,28 +278,41 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
+    restart: unless-stopped
     depends_on:
       zookeeper:
         condition: service_healthy
     ports:
       - "9092:9092"
     environment:
-      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_ID: -1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER: PLAINTEXT://0.0.0.0:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
     networks:
-    - shop-network
+      - shop-network
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.5.0
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
     ports:
-      - "8085:8081"
+      - "8087:8081"
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
@@ -229,6 +342,7 @@ services:
       - ./ai-service/src:/app/src  # Mount source code for live debugging
     networks:
       - shop-network
+      - shared-net
 
   # MailHog for email testing - http://localhost:8025 - all sent mails
   mailhog:
@@ -239,6 +353,7 @@ services:
       - "8025:8025" # Web UI
     networks:
       - shop-network
+      - shared-net
 
   # Jaeger for distributed tracing - http://localhost:16686
   jaeger:
@@ -254,11 +369,19 @@ services:
       - COLLECTOR_OTLP_ENABLED=true
     networks:
       - shop-network
-
+      - shared-net
+#  docker network create shared-net
 networks:
   shop-network:
     driver: bridge
+  shared-net:
+    external: true
 
 volumes:
   db-data:
   category-db-data:
+  order-db-data:
+  product-db-data:
+  zookeeper-data:
+  zookeeper-log:
+  kafka-data:

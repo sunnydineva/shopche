@@ -4,7 +4,7 @@ import com.shop.dto.order.OrderCreateDTO;
 import com.shop.dto.order.OrderDTO;
 import com.shop.dto.user.UserDTO;
 import com.shop.dto.user.UserUpdateDTO;
-import com.shop.service.OrderService;
+import com.shop.service.OrderServiceClient;
 import com.shop.service.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -27,11 +27,11 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
-    private final OrderService orderService;
+    private final OrderServiceClient orderServiceClient;
 
-    public UserController(UserService userService, OrderService orderService) {
+    public UserController(UserService userService, OrderServiceClient orderServiceClient) {
         this.userService = userService;
-        this.orderService = orderService;
+        this.orderServiceClient = orderServiceClient;
     }
 
     /**
@@ -74,7 +74,7 @@ public class UserController {
         Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
 
-        Page<OrderDTO> orders = orderService.getOrdersByUserId(user.getId(), pageable);
+        Page<OrderDTO> orders = orderServiceClient.getOrdersByUserId(user.getId(), pageable);
         return ResponseEntity.ok(orders);
     }
 
@@ -87,7 +87,7 @@ public class UserController {
         UserDTO user = userService.getCurrentUser(email);
 
         logger.info("Creating new order for user ID: {}", user.getId());
-        OrderDTO createdOrder = orderService.createOrder(orderCreateDTO, user.getId());
+        OrderDTO createdOrder = orderServiceClient.createOrder(orderCreateDTO, user.getId());
         return ResponseEntity.ok(createdOrder);
     }
 
