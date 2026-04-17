@@ -98,6 +98,7 @@ public class OrderDTO {
         private String productName;
         private Integer quantity;
         private BigDecimal unitPrice;
+        private String currency;
         private BigDecimal subtotal;
 
         // Constructors
@@ -143,6 +144,14 @@ public class OrderDTO {
 
         public void setUnitPrice(BigDecimal unitPrice) {
             this.unitPrice = unitPrice;
+        }
+
+        public String getCurrency() {
+            return currency;
+        }
+
+        public void setCurrency(String currency) {
+            this.currency = currency;
         }
 
         public BigDecimal getSubtotal() {

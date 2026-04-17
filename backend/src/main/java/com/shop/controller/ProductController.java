@@ -1,7 +1,7 @@
 package com.shop.controller;
 
 import com.shop.dto.product.ProductDTO;
-import com.shop.service.ProductService;
+import com.shop.service.ProductServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,9 +21,9 @@ import java.math.BigDecimal;
 public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
-    private final ProductService productService;
+    private final ProductServiceClient productService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductServiceClient productService) {
         this.productService = productService;
     }
 

@@ -1,0 +1,14 @@
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/dto/ProductDTO.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/dto/ProductUpdateDTO.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/service/CategoryServiceClient.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/mapper/ProductMapper.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/controller/ProductController.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/client/CategoryClient.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/service/ProductService.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/model/Product.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/exception/ResourceNotFoundException.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/model/enums/Currency.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/repository/ProductRepository.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/dto/ProductCreateDTO.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/ProductServiceApplication.java
+/home/sunny/ss/projects/test/online-shop/product-service/src/main/java/com/shop/product/dto/CategoryDTO.java

@@ -18,4 +18,4 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/src /usr/share/nginx/html/src
 EXPOSE 80
 # Add debug logging to nginx
-CMD ["nginx", "-g", "daemon off; error_log /dev/stdout debug;"]
+CMD ["/bin/sh", "-c", "echo 'Frontend is available at http://localhost:8083' && nginx -g 'daemon off; error_log /dev/stdout debug;'"]

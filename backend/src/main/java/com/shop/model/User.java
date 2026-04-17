@@ -45,9 +45,6 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Order> orders = new HashSet<>();
-
     // Constructors
     public User() {
     }
@@ -142,14 +139,6 @@ public class User {
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
-    }
-
-    public Set<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(Set<Order> orders) {
-        this.orders = orders;
     }
 
     // Helper methods

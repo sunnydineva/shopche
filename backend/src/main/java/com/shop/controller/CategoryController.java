@@ -2,7 +2,6 @@ package com.shop.controller;
 
 import com.shop.dto.category.CategoryDTO;
 import com.shop.service.CategoryServiceClient;
-import com.shop.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +21,9 @@ public class CategoryController {
 
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
     private final CategoryServiceClient categoryServiceClient;
-    private final ProductService productService;
 
-    public CategoryController(CategoryServiceClient categoryServiceClient, ProductService productService) {
+    public CategoryController(CategoryServiceClient categoryServiceClient) {
         this.categoryServiceClient = categoryServiceClient;
-        this.productService = productService;
     }
 
     /**

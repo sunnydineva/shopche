@@ -174,6 +174,7 @@ Shop Backend (Spring Boot)  — BFF / Orchestrator
 3. Start everything with Docker Compose (this runs all Spring Boot services inside containers):
 
 ```bash
+docker network create shared-net
 docker compose up -d
 ```
 
@@ -184,6 +185,8 @@ docker compose down
 ```
 
 After startup, open the frontend at `http://localhost:8083`.
+
+Note: The compose file expects an external Docker network named `shared-net`. Only services that may be reused outside this application (for example `mailhog` and `ai-service`) are attached to it.
 
 ### Demo Users
 
