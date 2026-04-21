@@ -45,6 +45,34 @@ const HomePage = () => {
     dispatch(addToCart({ product, quantity: 1 }));
   };
 
+  const renderPrice = (product: Product) => {
+    const hasPromotion = Boolean(product.activePromotion);
+
+    return (
+      <div className="mt-2">
+        {hasPromotion ? (
+          <div className="flex flex-col gap-1">
+            <p className="text-sm text-gray-500 line-through">
+              {product.basePrice} {product.currency}
+            </p>
+            <p className="text-lg font-semibold text-primary">
+              {product.price} {product.currency}
+            </p>
+            {product.activePromotion?.title ? (
+              <p className="text-xs font-medium text-green-600">
+                {product.activePromotion.title}
+              </p>
+            ) : null}
+          </div>
+        ) : (
+          <p className="text-lg font-semibold">
+            {product.price} {product.currency}
+          </p>
+        )}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
@@ -124,9 +152,7 @@ const HomePage = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
                 <p className="mt-1 text-gray-500">{product.categoryName}</p>
-                <p className="mt-2 text-lg font-semibold">
-                  {product.price} {product.currency}
-                </p>
+                {renderPrice(product)}
               </Link>
               <div className="mt-4">
                 <Button 

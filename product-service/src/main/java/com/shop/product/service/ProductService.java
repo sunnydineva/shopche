@@ -7,6 +7,7 @@ import com.shop.product.dto.ProductUpdateDTO;
 import com.shop.product.exception.ResourceNotFoundException;
 import com.shop.product.mapper.ProductMapper;
 import com.shop.product.model.Product;
+import com.shop.product.model.Promotion;
 import com.shop.product.repository.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,20 +26,23 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryServiceClient categoryServiceClient;
+    private final PromotionService promotionService;
     private final ProductMapper productMapper;
 
     public ProductService(ProductRepository productRepository,
                           CategoryServiceClient categoryServiceClient,
+                          PromotionService promotionService,
                           ProductMapper productMapper) {
         this.productRepository = productRepository;
         this.categoryServiceClient = categoryServiceClient;
+        this.promotionService = promotionService;
         this.productMapper = productMapper;
     }
 
     @Transactional(readOnly = true)
     public Page<ProductDTO> getAllProducts(Pageable pageable) {
         Page<Product> products = productRepository.findByIsActiveTrue(pageable);
-        return products.map(productMapper::toDTO);
+        return products.map(this::toProductDTO);
     }
 
     @Transactional(readOnly = true)
@@ -48,12 +52,12 @@ public class ProductService {
                                                    String name,
                                                    Pageable pageable) {
         Page<Product> products = productRepository.findProductsByFilters(categoryId, minPrice, maxPrice, name, pageable);
-        return products.map(productMapper::toDTO);
+        return products.map(this::toProductDTO);
     }
 
     @Transactional(readOnly = true)
     public ProductDTO getProductById(Long id) {
-        return productMapper.toDTO(findProductById(id));
+        return toProductDTO(findProductById(id));
     }
 
     @Transactional(readOnly = true)
@@ -61,7 +65,9 @@ public class ProductService {
         if (!categoryServiceClient.existsById(categoryId)) {
             throw new ResourceNotFoundException("Category", "id", categoryId);
         }
-        return productMapper.toDTOList(productRepository.findByCategoryId(categoryId));
+        return productRepository.findByCategoryId(categoryId).stream()
+                .map(this::toProductDTO)
+                .toList();
     }
 
     @Transactional
@@ -71,7 +77,7 @@ public class ProductService {
         productMapper.setCategory(product, categoryDTO.getId(), categoryDTO.getName());
         Product saved = productRepository.save(product);
         logger.info("Created product {}", saved.getId());
-        return productMapper.toDTO(saved);
+        return toProductDTO(saved);
     }
 
     @Transactional
@@ -87,7 +93,7 @@ public class ProductService {
         productMapper.updateEntity(product, dto);
         Product updated = productRepository.save(product);
         logger.info("Updated product {}", updated.getId());
-        return productMapper.toDTO(updated);
+        return toProductDTO(updated);
     }
 
     @Transactional
@@ -100,5 +106,12 @@ public class ProductService {
     private Product findProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+    }
+
+    private ProductDTO toProductDTO(Product product) {
+        Promotion activePromotion = promotionService.getActivePromotionEntity(product.getId()).orElse(null);
+        BigDecimal effectivePrice = promotionService.calculateEffectivePrice(product.getPrice(), activePromotion);
+        var promotionDTO = activePromotion != null ? promotionService.toDTO(activePromotion) : null;
+        return productMapper.toDTO(product, effectivePrice, promotionDTO);
     }
 }

@@ -5,9 +5,10 @@ import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import { useAuth } from '../../hooks/useAuth';
 import productService from '../../services/productService';
+import promotionService from '../../services/promotionService';
 import categoryService from '../../services/categoryService';
 import aiService from '../../services/aiService';
-import { Product, Category, PageRequest, ProductCreateRequest, ProductUpdateRequest, Currency } from '../../types/models';
+import { Product, Category, PageRequest, ProductCreateRequest, ProductUpdateRequest, Currency, DiscountType, PromotionCreateRequest, Promotion } from '../../types/models';
 
 const AdminProductsPage = () => {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -39,6 +40,18 @@ const AdminProductsPage = () => {
     stockQuantity: 0,
     imageUrl: '',
     categoryId: 0
+  });
+
+  const [createPromotion, setCreatePromotion] = useState(false);
+  const [existingPromotion, setExistingPromotion] = useState<Promotion | null>(null);
+  const [promotionForm, setPromotionForm] = useState({
+    title: '',
+    description: '',
+    discountType: DiscountType.PERCENTAGE,
+    discountValue: 0,
+    startAt: '',
+    endAt: '',
+    priority: 0
   });
 
   // AI generation loading states
@@ -119,11 +132,58 @@ const AdminProductsPage = () => {
     e.preventDefault();
 
     try {
+      const promotionEnabled = isCreating ? createPromotion : createPromotion || existingPromotion !== null;
+
+      if (promotionEnabled) {
+        if (!promotionForm.discountValue || !promotionForm.startAt || !promotionForm.endAt) {
+          setError('Please fill in promotion discount, start date, and end date before creating the promotion.');
+          return;
+        }
+      }
+
       if (isCreating) {
-        await productService.createProduct(formData as ProductCreateRequest);
+        const createdProduct = await productService.createProduct(formData as ProductCreateRequest);
+
+        if (createPromotion) {
+          const promotionPayload: PromotionCreateRequest = {
+            productId: createdProduct.id,
+            title: promotionForm.title || undefined,
+            description: promotionForm.description || undefined,
+            discountType: promotionForm.discountType,
+            discountValue: promotionForm.discountValue,
+            startAt: promotionForm.startAt,
+            endAt: promotionForm.endAt,
+            active: true,
+            priority: promotionForm.priority
+          };
+
+          await promotionService.createPromotion(promotionPayload);
+        }
+
         setIsCreating(false);
       } else if (isEditing && selectedProduct) {
         await productService.updateProduct(selectedProduct.id, formData as ProductUpdateRequest);
+
+        if (promotionEnabled) {
+          const promotionPayload = {
+            productId: selectedProduct.id,
+            title: promotionForm.title || undefined,
+            description: promotionForm.description || undefined,
+            discountType: promotionForm.discountType,
+            discountValue: promotionForm.discountValue,
+            startAt: promotionForm.startAt,
+            endAt: promotionForm.endAt,
+            active: true,
+            priority: promotionForm.priority
+          };
+
+          if (existingPromotion) {
+            await promotionService.updatePromotion(existingPromotion.id, promotionPayload);
+          } else {
+            await promotionService.createPromotion(promotionPayload);
+          }
+        }
+
         setIsEditing(false);
         setSelectedProduct(null);
       }
@@ -148,6 +208,17 @@ const AdminProductsPage = () => {
         stockQuantity: 0,
         imageUrl: '',
         categoryId: 0
+      });
+      setCreatePromotion(false);
+      setExistingPromotion(null);
+      setPromotionForm({
+        title: '',
+        description: '',
+        discountType: DiscountType.PERCENTAGE,
+        discountValue: 0,
+        startAt: '',
+        endAt: '',
+        priority: 0
       });
     } catch (err) {
       console.error('Error saving product:', err);
@@ -193,6 +264,17 @@ const AdminProductsPage = () => {
     });
     setIsEditing(true);
     setIsCreating(false);
+    setExistingPromotion(product.activePromotion || null);
+    setCreatePromotion(Boolean(product.activePromotion));
+    setPromotionForm({
+      title: product.activePromotion?.title || '',
+      description: product.activePromotion?.description || '',
+      discountType: product.activePromotion?.discountType || DiscountType.PERCENTAGE,
+      discountValue: product.activePromotion?.discountValue || 0,
+      startAt: product.activePromotion?.startAt ? product.activePromotion.startAt.slice(0, 16) : '',
+      endAt: product.activePromotion?.endAt ? product.activePromotion.endAt.slice(0, 16) : '',
+      priority: product.activePromotion?.priority || 0
+    });
   };
 
   // Handle AI description generation
@@ -316,6 +398,7 @@ const AdminProductsPage = () => {
             setIsCreating(true);
             setIsEditing(false);
             setSelectedProduct(null);
+            setCreatePromotion(false);
             setFormData({
               name: '',
               description: '',
@@ -324,6 +407,15 @@ const AdminProductsPage = () => {
               stockQuantity: 0,
               imageUrl: '',
               categoryId: 0
+            });
+            setPromotionForm({
+              title: '',
+              description: '',
+              discountType: DiscountType.PERCENTAGE,
+              discountValue: 0,
+              startAt: '',
+              endAt: '',
+              priority: 0
             });
           }}
         >
@@ -496,6 +588,99 @@ const AdminProductsPage = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               ></textarea>
             </div>
+
+            {(isCreating || isEditing) && (
+              <Card className="mb-4 p-4 bg-gray-50">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Promotion</h3>
+                  <label className="flex items-center space-x-2 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={createPromotion}
+                      onChange={(e) => setCreatePromotion(e.target.checked)}
+                    />
+                    <span>{isCreating ? 'Create promotion with product' : 'Edit product promotion'}</span>
+                  </label>
+                </div>
+
+                {createPromotion && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Promotion title</label>
+                      <Input
+                        type="text"
+                        value={promotionForm.title}
+                        onChange={(e) => setPromotionForm({ ...promotionForm, title: e.target.value })}
+                        placeholder="Summer sale"
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Discount type</label>
+                      <select
+                        value={promotionForm.discountType}
+                        onChange={(e) => setPromotionForm({ ...promotionForm, discountType: e.target.value as DiscountType })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                      >
+                        <option value={DiscountType.PERCENTAGE}>Percentage</option>
+                        <option value={DiscountType.FIXED_AMOUNT}>Fixed amount</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Discount value</label>
+                      <Input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        value={promotionForm.discountValue}
+                        onChange={(e) => setPromotionForm({ ...promotionForm, discountValue: Number(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={promotionForm.priority}
+                        onChange={(e) => setPromotionForm({ ...promotionForm, priority: Number(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Start at</label>
+                      <Input
+                        type="datetime-local"
+                        value={promotionForm.startAt}
+                        onChange={(e) => setPromotionForm({ ...promotionForm, startAt: e.target.value })}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">End at</label>
+                      <Input
+                        type="datetime-local"
+                        value={promotionForm.endAt}
+                        onChange={(e) => setPromotionForm({ ...promotionForm, endAt: e.target.value })}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Promotion description</label>
+                      <textarea
+                        value={promotionForm.description}
+                        onChange={(e) => setPromotionForm({ ...promotionForm, description: e.target.value })}
+                        rows={3}
+                        placeholder="Optional promotion description"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                      />
+                    </div>
+                  </div>
+                )}
+              </Card>
+            )}
+
             <div className="flex justify-end space-x-2">
               <Button
                 variant="outline"
@@ -503,6 +688,17 @@ const AdminProductsPage = () => {
                   setIsCreating(false);
                   setIsEditing(false);
                   setSelectedProduct(null);
+                  setCreatePromotion(false);
+                  setExistingPromotion(null);
+                  setPromotionForm({
+                    title: '',
+                    description: '',
+                    discountType: DiscountType.PERCENTAGE,
+                    discountValue: 0,
+                    startAt: '',
+                    endAt: '',
+                    priority: 0
+                  });
                 }}
               >
                 Cancel

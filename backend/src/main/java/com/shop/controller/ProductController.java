@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 /**
  * Controller for public product endpoints
@@ -44,8 +45,7 @@ public class ProductController {
         logger.info("Fetching products with filters: categoryId={}, minPrice={}, maxPrice={}, name={}, page={}, size={}, sort={}, direction={}",
                 categoryId, minPrice, maxPrice, name, page, size, sort, direction);
 
-        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sort));
+        Pageable pageable = PageRequest.of(page, size, buildSort(sort, direction));
 
         Page<ProductDTO> products;
         if (categoryId != null || minPrice != null || maxPrice != null || name != null) {
@@ -65,5 +65,24 @@ public class ProductController {
         logger.info("Fetching product with ID: {}", id);
         ProductDTO product = productService.getProductById(id);
         return ResponseEntity.ok(product);
+    }
+
+    private Sort buildSort(String sort, String direction) {
+        if (sort != null && sort.contains(",")) {
+            String[] parts = Arrays.stream(sort.split(","))
+                    .map(String::trim)
+                    .toArray(String[]::new);
+            if (parts.length == 2) {
+                Sort.Direction parsedDirection = parts[1].equalsIgnoreCase("desc")
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
+                return Sort.by(parsedDirection, parts[0]);
+            }
+        }
+
+        Sort.Direction sortDirection = direction != null && direction.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+        return Sort.by(sortDirection, sort == null || sort.isBlank() ? "id" : sort);
     }
 }

@@ -188,6 +188,24 @@ After startup, open the frontend at `http://localhost:8083`.
 
 Note: The compose file expects an external Docker network named `shared-net`. Only services that may be reused outside this application (for example `mailhog` and `ai-service`) are attached to it.
 
+### Port Mapping
+
+The services listen on these host ports:
+
+| Service           | Host URL                    | Container Port | Notes                         |
+|------------------|-----------------------------|----------------|-------------------------------|
+| frontend         | http://localhost:8083       | 80             | React UI                      |
+| backend          | http://localhost:8081/api   | 8080           | Main API / BFF                |
+| category-service | http://localhost:8084/api   | 8083           | Category microservice         |
+| order-service    | http://localhost:8085/api   | 8085           | Order microservice            |
+| product-service  | http://localhost:8086/api   | 8084           | Product microservice          |
+| email-service    | http://localhost:8082       | 8082           | Email service                 |
+| ai-service       | internal only               | 8081           | AI service, called by backend |
+| schema-registry  | http://localhost:8087       | 8081           | Kafka schema registry         |
+| kafka            | localhost:9092              | 9092           | Kafka broker                  |
+| zookeeper        | localhost:2181              | 2181           | Kafka coordination            |
+| mailhog          | http://localhost:8025       | 8025           | Email testing UI              |
+
 ### Demo Users
 
 The application comes with a set of predefined demo users for testing authentication and authorization.
@@ -201,17 +219,6 @@ The application comes with a set of predefined demo users for testing authentica
 | User       | `user@example.com`      | `password`     | Regular customer account  |
 
 You can log in with these credentials from the frontend login page.
-
-### Service Ports
-
-| Service           | URL                         | Description                      |
-|------------------|-----------------------------|----------------------------------|
-| frontend         | http://localhost:8083       | React UI                         |
-| backend          | http://localhost:8081/api   | Main API (BFF)                   |
-| category-service | http://localhost:8084/api   | Category API                     |
-| ai-service       | http://localhost:8085/api   | AI API                           |
-| email-service    | http://localhost:8082       | Email service (internal)         |
-| mailhog          | http://localhost:8025       | Email testing UI                 |
 
 ## Local Development
 

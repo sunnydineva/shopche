@@ -45,15 +45,56 @@ export interface Product {
   id: number;
   name: string;
   description: string;
+  basePrice: number;
   price: number;
   currency: string;
   stockQuantity: number;
   imageUrl: string | null;
   categoryId: number;
   categoryName: string;
+  activePromotion?: Promotion | null;
   createdAt: string;
   updatedAt: string;
   isActive: boolean;
+}
+
+export interface Promotion {
+  id: number;
+  productId: number;
+  title?: string | null;
+  description?: string | null;
+  discountType: DiscountType;
+  discountValue: number;
+  startAt: string;
+  endAt: string;
+  active: boolean;
+  priority: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PromotionCreateRequest {
+  productId: number;
+  title?: string | null;
+  description?: string | null;
+  discountType: DiscountType;
+  discountValue: number;
+  startAt: string;
+  endAt: string;
+  active?: boolean;
+  priority?: number;
+}
+
+export interface PromotionUpdateRequest {
+  productId?: number;
+  title?: string | null;
+  description?: string | null;
+  discountType?: DiscountType;
+  discountValue?: number;
+  startAt?: string;
+  endAt?: string;
+  active?: boolean;
+  priority?: number;
 }
 
 export interface ProductCreateRequest {
@@ -136,6 +177,11 @@ export enum Currency {
   AUD = 'AUD',
   CHF = 'CHF',
   CNY = 'CNY'
+}
+
+export enum DiscountType {
+  PERCENTAGE = 'PERCENTAGE',
+  FIXED_AMOUNT = 'FIXED_AMOUNT'
 }
 
 // Pagination related interfaces

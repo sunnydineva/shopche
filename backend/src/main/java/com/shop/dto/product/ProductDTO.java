@@ -1,6 +1,7 @@
 package com.shop.dto.product;
 
 import com.shop.model.enums.Currency;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,16 +9,19 @@ import java.time.LocalDateTime;
 /**
  * Data Transfer Object for Product responses
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductDTO {
     private Long id;
     private String name;
     private String description;
+    private BigDecimal basePrice;
     private BigDecimal price;
     private Currency currency;
     private Integer stockQuantity;
     private String imageUrl;
     private Long categoryId;
     private String categoryName;
+    private PromotionDTO activePromotion;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Boolean isActive;
@@ -49,6 +53,14 @@ public class ProductDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public BigDecimal getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(BigDecimal basePrice) {
+        this.basePrice = basePrice;
     }
 
     public BigDecimal getPrice() {
@@ -97,6 +109,14 @@ public class ProductDTO {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public PromotionDTO getActivePromotion() {
+        return activePromotion;
+    }
+
+    public void setActivePromotion(PromotionDTO activePromotion) {
+        this.activePromotion = activePromotion;
     }
 
     public LocalDateTime getCreatedAt() {

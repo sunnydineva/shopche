@@ -55,6 +55,8 @@ const ProductDetailPage = () => {
     }
   };
 
+  const hasPromotion = Boolean(product?.activePromotion);
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
@@ -124,9 +126,25 @@ const ProductDetailPage = () => {
           <p className="text-gray-500 mb-4">Category: {product.categoryName}</p>
 
           <div className="mb-6">
-            <p className="text-2xl font-semibold text-primary">
-              {product.price} {product.currency}
-            </p>
+            {hasPromotion ? (
+              <div className="flex flex-col gap-1">
+                <p className="text-sm text-gray-500 line-through">
+                  {product.basePrice} {product.currency}
+                </p>
+                <p className="text-2xl font-semibold text-primary">
+                  {product.price} {product.currency}
+                </p>
+                {product.activePromotion?.title ? (
+                  <p className="text-sm font-medium text-green-600">
+                    {product.activePromotion.title}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <p className="text-2xl font-semibold text-primary">
+                {product.price} {product.currency}
+              </p>
+            )}
             <p className="text-sm text-gray-500 mt-1">
               {product.stockQuantity > 0 
                 ? `In Stock (${product.stockQuantity} available)` 

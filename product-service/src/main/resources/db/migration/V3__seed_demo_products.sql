@@ -1,0 +1,67 @@
+INSERT INTO products (
+    id,
+    name,
+    description,
+    price,
+    currency,
+    stock_quantity,
+    image_url,
+    category_id,
+    category_name,
+    is_active,
+    created_at,
+    updated_at
+) VALUES
+    (
+        1,
+        'Smartphone X1',
+        'Powerful smartphone for everyday use',
+        799.90,
+        'EUR',
+        10,
+        'https://images.stockcake.com/public/4/1/f/41ff3157-5cf5-4fb6-894e-ca05ea4f8da0_large/smartphone-interactive-display-stockcake.jpg',
+        1,
+        'Electronics',
+        TRUE,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    ),
+    (
+        2,
+        'Cotton T-Shirt',
+        'Comfortable unisex cotton T-shirt',
+        19.99,
+        'EUR',
+        50,
+        'https://images.stockcake.com/public/f/4/0/f401f957-cbd4-4082-a965-0e438b2f515f_large/geometric-design-t-shirt-stockcake.jpg',
+        2,
+        'Clothing',
+        TRUE,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    ),
+    (
+        3,
+        'Fantasy Novel',
+        'Bestselling fantasy novel',
+        14.50,
+        'EUR',
+        30,
+        'https://images.stockcake.com/public/f/e/7/fe72d21e-9554-4ce9-841d-ae55f30313e4_large/elegant-floating-book-stockcake.jpg',
+        3,
+        'Books',
+        TRUE,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+    )
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    description = VALUES(description),
+    price = VALUES(price),
+    currency = VALUES(currency),
+    stock_quantity = VALUES(stock_quantity),
+    image_url = VALUES(image_url),
+    category_id = VALUES(category_id),
+    category_name = VALUES(category_name),
+    is_active = VALUES(is_active),
+    updated_at = VALUES(updated_at);

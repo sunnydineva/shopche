@@ -2,10 +2,12 @@ package com.shop.product.mapper;
 
 import com.shop.product.dto.ProductCreateDTO;
 import com.shop.product.dto.ProductDTO;
+import com.shop.product.dto.PromotionDTO;
 import com.shop.product.dto.ProductUpdateDTO;
 import com.shop.product.model.Product;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +16,10 @@ import java.util.stream.Collectors;
 public class ProductMapper {
 
     public ProductDTO toDTO(Product product) {
+        return toDTO(product, product != null ? product.getPrice() : null, null);
+    }
+
+    public ProductDTO toDTO(Product product, BigDecimal effectivePrice, PromotionDTO activePromotion) {
         if (product == null) {
             return null;
         }
@@ -22,12 +28,14 @@ public class ProductMapper {
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());
-        dto.setPrice(product.getPrice());
+        dto.setBasePrice(product.getPrice());
+        dto.setPrice(effectivePrice);
         dto.setCurrency(product.getCurrency());
         dto.setStockQuantity(product.getStockQuantity());
         dto.setImageUrl(product.getImageUrl());
         dto.setCategoryId(product.getCategoryId());
         dto.setCategoryName(product.getCategoryName());
+        dto.setActivePromotion(activePromotion);
         dto.setCreatedAt(product.getCreatedAt());
         dto.setUpdatedAt(product.getUpdatedAt());
         dto.setIsActive(product.getIsActive());

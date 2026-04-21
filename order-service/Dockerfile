@@ -17,7 +17,7 @@ RUN apt-get update \
 
 COPY --from=build /build/target/*.jar app.jar
 
-EXPOSE 8083
+EXPOSE 8085
 EXPOSE 5007
 
 ENTRYPOINT ["sh", "-c", "until nc -z order-db 3306; do echo 'Waiting for order-db...'; sleep 2; done; exec java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar app.jar"]

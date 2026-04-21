@@ -106,6 +106,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      FLYWAY_REPAIR_ON_STARTUP: ${FLYWAY_REPAIR_ON_STARTUP:-true}
       JWT_SECRET: ${JWT_SECRET}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
       SCHEMA_REGISTRY_URL: http://schema-registry:8081
@@ -249,7 +250,7 @@ services:
       LOGGING_LEVEL_ROOT: INFO
       LOGGING_LEVEL_COM_SHOP: INFO
     ports:
-      - "8085:8083"
+      - "8085:8085"
       - "5010:5007"  # Expose remote debug port
     volumes:
       - ./order-service/src:/app/src  # Mount source code for live debugging
