@@ -45,10 +45,7 @@ class AuthService {
    * Logout user
    */
   public logout(): void {
-    api.clearToken();
-    localStorage.removeItem('user');
-    // Redirect to home page
-    window.location.href = '/';
+    api.clearAuthData();
   }
 
   /**

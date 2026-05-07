@@ -74,6 +74,14 @@ const authSlice = createSlice({
       state.isAdmin = false;
       state.error = null;
     },
+    forceLogout: (state) => {
+      authService.logout();
+      state.user = null;
+      state.isAuthenticated = false;
+      state.isAdmin = false;
+      state.loading = false;
+      state.error = null;
+    },
     clearError: (state) => {
       state.error = null;
     },
@@ -117,16 +125,22 @@ const authSlice = createSlice({
     builder.addCase(fetchCurrentUser.fulfilled, (state, action: PayloadAction<User | null>) => {
       state.loading = false;
       state.user = action.payload;
+      state.isAuthenticated = !!action.payload;
+      state.isAdmin = !!action.payload?.roles?.includes('ROLE_ADMIN');
       state.error = null;
     });
     builder.addCase(fetchCurrentUser.rejected, (state, action) => {
+      authService.logout();
       state.loading = false;
+      state.user = null;
+      state.isAuthenticated = false;
+      state.isAdmin = false;
       state.error = action.payload as string;
     });
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, forceLogout, clearError } = authSlice.actions;
 
 // Selectors
 export const selectAuth = (state: { auth: AuthState }): AuthState => state.auth;

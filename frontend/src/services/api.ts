@@ -32,11 +32,9 @@ class ApiService {
     this.api.interceptors.response.use(
       (response) => response,
       (error) => {
-        // Handle 401 Unauthorized errors
         if (error.response && error.response.status === 401) {
-          // Clear token and redirect to login
-          this.clearToken();
-          window.location.href = '/login';
+          this.clearAuthData();
+          window.dispatchEvent(new Event('auth:unauthorized'));
         }
         return Promise.reject(error);
       }
@@ -75,6 +73,14 @@ class ApiService {
   }
 
   /**
+   * Clear all persisted authentication data
+   */
+  public clearAuthData(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
+
+  /**
    * Set auth data from login/register response
    */
   public setAuthData(authResponse: AuthResponse): void {
@@ -90,7 +96,7 @@ class ApiService {
    * Check if user is authenticated
    */
   public isAuthenticated(): boolean {
-    return !!this.getToken();
+    return !!this.getToken() && !!this.getCurrentUser();
   }
 
   /**
