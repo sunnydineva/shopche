@@ -53,9 +53,9 @@ public class OrderServiceClient {
     /**
      * Create a new order
      */
-    public OrderDTO createOrder(OrderCreateDTO orderCreateDTO, Long userId) {
+    public OrderDTO createOrder(OrderCreateDTO orderCreateDTO, Long userId, String userEmail) {
         logger.info("Creating order for user ID {} through order service", userId);
-        return unwrap(orderClient.createOrder(orderCreateDTO, userId), "Order", userId);
+        return unwrap(orderClient.createOrder(orderCreateDTO, userId, userEmail), "Order", userId);
     }
 
     /**

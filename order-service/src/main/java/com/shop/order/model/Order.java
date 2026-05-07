@@ -1,6 +1,6 @@
 package com.shop.order.model;
 
-import com.shop.model.enums.OrderStatus;
+import com.shop.order.model.enums.OrderStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,8 +10,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -33,9 +31,11 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "user_email")
+    private String userEmail;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
@@ -57,8 +57,9 @@ public class Order {
     public Order() {
     }
 
-    public Order(User user) {
-        this.user = user;
+    public Order(Long userId, String userEmail) {
+        this.userId = userId;
+        this.userEmail = userEmail;
     }
 
     // JPA lifecycle callbacks
@@ -82,12 +83,20 @@ public class Order {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     public List<OrderItem> getOrderItems() {
@@ -160,14 +169,6 @@ public class Order {
             throw new IllegalStateException("Order cannot be canceled in status: " + status);
         }
         this.status = OrderStatus.CANCELED;
-
-        // Return items to stock
-        for (OrderItem item : orderItems) {
-            Product product = item.getProduct();
-            if (product != null) {
-                product.increaseStock(item.getQuantity());
-            }
-        }
     }
 
     // Object methods
@@ -188,7 +189,7 @@ public class Order {
     public String toString() {
         return "Order{" +
                 "id=" + id +
-                ", userId=" + (user != null ? user.getId() : null) +
+                ", userId=" + userId +
                 ", totalAmount=" + totalAmount +
                 ", status=" + status +
                 ", createdAt=" + createdAt +

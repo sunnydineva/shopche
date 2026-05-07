@@ -87,7 +87,7 @@ public class UserController {
         UserDTO user = userService.getCurrentUser(email);
 
         logger.info("Creating new order for user ID: {}", user.getId());
-        OrderDTO createdOrder = orderServiceClient.createOrder(orderCreateDTO, user.getId());
+        OrderDTO createdOrder = orderServiceClient.createOrder(orderCreateDTO, user.getId(), user.getEmail());
         return ResponseEntity.ok(createdOrder);
     }
 

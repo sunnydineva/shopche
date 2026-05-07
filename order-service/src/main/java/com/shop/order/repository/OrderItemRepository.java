@@ -1,6 +1,6 @@
 package com.shop.order.repository;
 
-import com.shop.model.OrderItem;
+import com.shop.order.model.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,6 +24,6 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     long countByProductId(Long productId);
     
     // Sum quantity of order items by product id
-    @Query("SELECT SUM(oi.quantity) FROM OrderItem oi WHERE oi.product.id = :productId")
+    @Query("SELECT SUM(oi.quantity) FROM OrderItem oi WHERE oi.productId = :productId")
     Integer sumQuantityByProductId(@Param("productId") Long productId);
 }

@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Main application class for the Order Service
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.shop")
 public class OrderServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CategoryServiceApplication.class, args);
+        SpringApplication.run(OrderServiceApplication.class, args);
     }
 }

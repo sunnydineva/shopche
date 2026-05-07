@@ -1,6 +1,6 @@
 package com.shop.order.dto;
 
-import com.shop.model.enums.OrderStatus;
+import com.shop.order.model.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 
 /**

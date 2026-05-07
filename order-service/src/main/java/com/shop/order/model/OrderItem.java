@@ -1,6 +1,5 @@
 package com.shop.order.model;
 
-import com.shop.model.Order;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -28,9 +27,11 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+
+    @Column(name = "product_name", nullable = false)
+    private String productName;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
@@ -41,15 +42,20 @@ public class OrderItem {
     @Column(name = "subtotal", nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 
+    @Column(name = "currency", nullable = false, length = 10)
+    private String currency;
+
     // Constructors
     public OrderItem() {
     }
 
-    public OrderItem(Order order, Product product, Integer quantity) {
+    public OrderItem(Order order, Long productId, String productName, Integer quantity, BigDecimal unitPrice, String currency) {
         this.order = order;
-        this.product = product;
+        this.productId = productId;
+        this.productName = productName;
         this.quantity = quantity;
-        this.unitPrice = product.getPrice();
+        this.unitPrice = unitPrice;
+        this.currency = currency;
         this.subtotal = calculateSubtotal();
     }
 
@@ -70,12 +76,20 @@ public class OrderItem {
         this.order = order;
     }
 
-    public Product getProduct() {
-        return product;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public Integer getQuantity() {
@@ -102,6 +116,14 @@ public class OrderItem {
 
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     // Business methods
@@ -131,7 +153,7 @@ public class OrderItem {
         return "OrderItem{" +
                 "id=" + id +
                 ", orderId=" + (order != null ? order.getId() : null) +
-                ", productId=" + (product != null ? product.getId() : null) +
+                ", productId=" + productId +
                 ", quantity=" + quantity +
                 ", unitPrice=" + unitPrice +
                 ", subtotal=" + subtotal +

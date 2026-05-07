@@ -1,12 +1,11 @@
 package com.shop.mapper;
 
+import com.shop.order.dto.OrderCreateDTO;
 import com.shop.order.dto.OrderDTO;
 import com.shop.order.dto.OrderStatusUpdateDTO;
+import com.shop.order.dto.ProductDTO;
 import com.shop.order.model.Order;
 import com.shop.order.model.OrderItem;
-import com.shop.order.model.Product;
-import com.shop.order.model.User;
-import com.shop.order.dto.OrderCreateDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -15,16 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Mapper for converting between Order entity and DTOs
- */
 @Component
-public class OrderMapper
-{
+public class OrderMapper {
 
-    /**
-     * Convert Order entity to OrderDTO
-     */
     public OrderDTO toDTO(Order order) {
         if (order == null) {
             return null;
@@ -32,15 +24,12 @@ public class OrderMapper
 
         OrderDTO dto = new OrderDTO();
         dto.setId(order.getId());
+        dto.setUserId(order.getUserId());
+        dto.setUserEmail(order.getUserEmail());
         dto.setTotalAmount(order.getTotalAmount());
         dto.setStatus(order.getStatus());
         dto.setCreatedAt(order.getCreatedAt());
         dto.setUpdatedAt(order.getUpdatedAt());
-
-        if (order.getUser() != null) {
-            dto.setUserId(order.getUser().getId());
-            dto.setUserEmail(order.getUser().getEmail());
-        }
 
         if (order.getOrderItems() != null) {
             List<OrderDTO.OrderItemDTO> itemDTOs = order.getOrderItems().stream()
@@ -52,9 +41,6 @@ public class OrderMapper
         return dto;
     }
 
-    /**
-     * Convert OrderItem entity to OrderItemDTO
-     */
     private OrderDTO.OrderItemDTO toOrderItemDTO(OrderItem orderItem) {
         if (orderItem == null) {
             return null;
@@ -62,86 +48,82 @@ public class OrderMapper
 
         OrderDTO.OrderItemDTO dto = new OrderDTO.OrderItemDTO();
         dto.setId(orderItem.getId());
+        dto.setProductId(orderItem.getProductId());
+        dto.setProductName(orderItem.getProductName());
         dto.setQuantity(orderItem.getQuantity());
         dto.setUnitPrice(orderItem.getUnitPrice());
+        dto.setCurrency(orderItem.getCurrency());
         dto.setSubtotal(orderItem.getSubtotal());
-
-        if (orderItem.getProduct() != null) {
-            dto.setProductId(orderItem.getProduct().getId());
-            dto.setProductName(orderItem.getProduct().getName());
-        }
-
         return dto;
     }
 
-    /**
-     * Convert list of Order entities to list of OrderDTOs
-     */
     public List<OrderDTO> toDTOList(List<Order> orders) {
         return orders.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Create Order entity from OrderCreateDTO and User
-     */
-    public Order createOrderFromDTO(OrderCreateDTO dto, User user, List<Product> products) {
-        if (dto == null || user == null || products == null || products.isEmpty()) {
+    public Order createOrderFromDTO(OrderCreateDTO dto, Long userId, String userEmail, List<ProductSnapshot> products) {
+        if (dto == null || userId == null || products == null || products.isEmpty()) {
             return null;
         }
 
-        Order order = new Order();
-        order.setUser(user);
+        Order order = new Order(userId, userEmail);
         order.setOrderItems(new ArrayList<>());
         order.setCreatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now());
 
-        // Create order items
         for (OrderCreateDTO.OrderItemCreateDTO itemDTO : dto.getItems()) {
-            Product product = findProductById(products, itemDTO.getProductId());
+            ProductSnapshot product = findProductById(products, itemDTO.getProductId());
             if (product != null) {
                 OrderItem orderItem = new OrderItem();
                 orderItem.setOrder(order);
-                orderItem.setProduct(product);
+                orderItem.setProductId(product.productId());
+                orderItem.setProductName(product.productName());
                 orderItem.setQuantity(itemDTO.getQuantity());
-
-                // Safely set unit price and calculate subtotal
-                BigDecimal price = product.getPrice();
-                orderItem.setUnitPrice(price);
-                if (price != null && itemDTO.getQuantity() != null) {
-                    orderItem.setSubtotal(price.multiply(BigDecimal.valueOf(itemDTO.getQuantity())));
-                } else {
-                    orderItem.setSubtotal(BigDecimal.ZERO);
-                }
-
+                orderItem.setUnitPrice(product.price());
+                orderItem.setCurrency(product.currency());
+                orderItem.setSubtotal(orderItem.calculateSubtotal());
                 order.getOrderItems().add(orderItem);
             }
         }
 
-        // Calculate total amount
         order.recalculateTotalAmount();
-
         return order;
     }
 
-    /**
-     * Update Order status from OrderStatusUpdateDTO
-     */
     public void updateOrderStatus(Order order, OrderStatusUpdateDTO dto) {
         if (order == null || dto == null) {
             return;
         }
-
         order.setStatus(dto.getStatus());
     }
 
-    /**
-     * Helper method to find a product by ID in a list
-     */
-    private Product findProductById(List<Product> products, Long productId) {
+    public ProductSnapshot toSnapshot(ProductDTO product) {
+        if (product == null) {
+            return null;
+        }
+        return new ProductSnapshot(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                product.getCurrency() != null ? product.getCurrency() : "UNKNOWN"
+        );
+    }
+
+    public List<ProductSnapshot> toSnapshots(List<ProductDTO> products) {
         return products.stream()
-                .filter(p -> p.getId().equals(productId))
+                .map(this::toSnapshot)
+                .collect(Collectors.toList());
+    }
+
+    private ProductSnapshot findProductById(List<ProductSnapshot> products, Long productId) {
+        return products.stream()
+                .filter(p -> p.productId().equals(productId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public record ProductSnapshot(Long productId, String productName, BigDecimal price, String currency) {
     }
 }

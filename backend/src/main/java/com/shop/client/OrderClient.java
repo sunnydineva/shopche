@@ -42,7 +42,10 @@ public interface OrderClient
      * Create a new order
      */
     @PostMapping("/api/user/orders")
-    ResponseEntity<OrderDTO> createOrder(@RequestBody OrderCreateDTO orderCreateDTO, @RequestParam("userId") Long userId);
+    ResponseEntity<OrderDTO> createOrder(
+            @RequestBody OrderCreateDTO orderCreateDTO,
+            @RequestParam("userId") Long userId,
+            @RequestParam("userEmail") String userEmail);
 
 
     /**
