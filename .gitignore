@@ -33,10 +33,10 @@ bin/
 .DS_Store
 
 ### Backend ###
-backend/target/
-backend/.mvn/
-backend/mvnw
-backend/mvnw.cmd
+**/target/
+**/t.mvn/
+**/tmvnw
+**/tmvnw.cmd
 
 ### Frontend ###
 frontend/node_modules/
